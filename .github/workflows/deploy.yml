@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "Copying nginx configuration.."
 
-          sudo cp ./nginx.conf /etc/nginx/nginx.conf
+          sudo cp ./nginx/nginx.conf /etc/nginx/nginx.conf
           sudo nginx -t
 
       - name: Restart Nginx
