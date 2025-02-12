@@ -1,0 +1,35 @@
+name: Deployment Workflow
+
+on: 
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v3
+
+      - name: Setup application
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.3'
+
+      - name: Install dependencies from requirements
+        run: |
+          # Setup virtual environment
+          python -m venv venv
+          source venv/Scripts/activate
+
+          # Install dependencies
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Deploy application
+        run: |
+          echo "Application deploying.."
+          # Add deployment command here
