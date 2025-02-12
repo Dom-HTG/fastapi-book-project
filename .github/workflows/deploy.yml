@@ -23,13 +23,31 @@ jobs:
         run: |
           # Setup virtual environment
           python -m venv venv
-          . venv/Scripts/activate
+          source venv/bin/activate
 
           # Install dependencies
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Copy nginx configuration and test
+        run: |
+          echo "Copying nginx configuration.."
+
+          sudo cp ./nginx.conf /etc/nginx/nginx.conf
+          sudo nginx -t
+
+      - name: Restart Nginx
+        run: |
+          echo "Restarting Nginx.."
+
+          sudo systemctl restart nginx
+
       - name: Deploy application
         run: |
           echo "Application deploying.."
-          # Add deployment command here
+          pkill -f "uvicorn"
+            
+          # Restart your application
+          nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
+
+          echo "Application deployed.."
