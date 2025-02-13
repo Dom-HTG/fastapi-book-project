@@ -45,9 +45,8 @@ jobs:
       - name: Deploy application
         run: |
           echo "Application deploying.."
-          pkill -f "uvicorn"
             
-          # Restart your application
+          # start your application
           uvicorn main:app
 
           echo "Application deployed.."
