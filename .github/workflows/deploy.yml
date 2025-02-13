@@ -47,7 +47,7 @@ jobs:
           echo "Application deploying.."
           source venv/bin/activate
 
-          # Restart your application
+          # start your application
           nohup uvicorn main:app &
 
           echo "Application deployed.."
