@@ -43,7 +43,7 @@ jobs:
           sudo systemctl restart nginx
 
       - name: Deploy to Railway
-        uses: railwayapp/action@v1
+        uses: bervProject/railway-deploy@main
         with:
           apiToken: ${{ secrets.RAILWAY_API_TOKEN }}
           app: fastapi-book-project
