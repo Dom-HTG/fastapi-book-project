@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.12.3'
 
-      - name: Install all dependencies from requirements
+      - name: Install all the dependencies from requirements
         run: |
           # Setup virtual environment
           python -m venv venv
@@ -47,8 +47,7 @@ jobs:
           echo "Application deploying.."
           source venv/bin/activate
           pkill -f "uvicorn"
-
-          # start your application
+          # Restart your application
           nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
 
           echo "Application deployed.."
