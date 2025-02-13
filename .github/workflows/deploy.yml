@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.12.3'
 
-      - name: Install all dependencies from requirements
+      - name: Install dependencies from requirements
         run: |
           # Setup virtual environment
           python -m venv venv
