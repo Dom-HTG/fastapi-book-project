@@ -45,7 +45,8 @@ jobs:
       - name: Deploy application
         run: |
           echo "Application deploying.."
-            
+          source venv/bin/activate
+
           # start your application
           uvicorn main:app
 
