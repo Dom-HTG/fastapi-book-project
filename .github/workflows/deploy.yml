@@ -42,7 +42,13 @@ jobs:
 
           sudo systemctl restart nginx
 
-      - name: Deploy application
+      - name: Deploy to Railway
+        uses: railwayapp/action@v1
+          with:
+            apiToken: ${{ secrets.RAILWAY_API_TOKEN }}
+            app: fastapi-book-project
+
+      - name: Start application
         run: |
           echo "Application deploying.."
           source venv/bin/activate
