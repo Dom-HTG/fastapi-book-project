@@ -25,7 +25,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Copy files to EC2
+      - name: Copy the files to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
