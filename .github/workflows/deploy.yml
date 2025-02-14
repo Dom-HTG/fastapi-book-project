@@ -41,7 +41,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_KEY_PAIR }}  
           script: |
-            # Application deployment..
+            # Application deployment.
             cd /home/ec2-user/app
 
             sudo yum install python3 -y
