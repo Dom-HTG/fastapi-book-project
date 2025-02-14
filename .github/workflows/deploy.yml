@@ -41,8 +41,13 @@ jobs:
           script: |
             set -e
             echo "Starting deployment on EC2..."
-            
-            ssh -i <(echo "${{ secrets.EC2_KEY_PAIR }}") ec2-user@${{ secrets.EC2_HOST }} "echo Connected successfully" || exit 1
+
+            # Retrieve pem
+            echo "${{ secrets.EC2_KEY_PAIR }}" > ec2_key.pem
+            chmod 600 ec2_key.pem
+
+            # Test SSH connection
+            ssh -i ec2_key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} "echo Connected successfully" || exit 1
 
 
             # Move to project directory
