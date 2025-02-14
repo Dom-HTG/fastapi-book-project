@@ -52,6 +52,10 @@ jobs:
             pip install --upgrade pip
             pip install -r requirements.txt
 
+            # Install nginx
+            sudo apt-get update -y
+            sudo apt-get install nginx -y
+
             # Copy nginx config and restart nginx
             sudo cp ./nginx/nginx.conf /etc/nginx/nginx.conf
             sudo systemctl restart nginx
