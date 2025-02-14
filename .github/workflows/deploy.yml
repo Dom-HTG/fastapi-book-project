@@ -51,6 +51,12 @@ jobs:
             fi
             python3 -m ensurepip --default-pip
 
+            # Remove redundant environment
+            if [ -d "venv" ]; then
+              echo "Removing existing virtual environment..."
+              rm -rf venv
+            fi
+
             # Set up virtual environment
             python3 -m venv venv
             source venv/bin/activate
