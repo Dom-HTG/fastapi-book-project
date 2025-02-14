@@ -87,6 +87,12 @@ jobs:
             echo "Starting FastAPI application..."
             nohup venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
             disown
+
+            echo "Checking if Uvicorn is running..."
+            if ! pgrep -f "uvicorn"; then
+              echo "Uvicorn failed to start!"
+              exit 1
+            fi
             echo "Deployment completed!"
 
             # Show logs
