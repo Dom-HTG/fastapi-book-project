@@ -1,13 +1,11 @@
 name: Deployment Workflow
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches: [main]
 
 jobs:
   deploy:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout codebase
@@ -18,60 +16,62 @@ jobs:
         with:
           python-version: '3.12.3'
 
-      - name: Install all the dependencies
+      - name: Install dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Copy the files to EC2
+      - name: Copy files to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
-          key: ${{ secrets.EC2_KEY_PAIR }} 
-          source: ./
-          target: /home/ec2-user/app
+          key: ${{ secrets.EC2_KEY_PAIR }}
+          source: "./*"
+          target: "/home/ec2-user/app"
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
-          key: ${{ secrets.EC2_KEY_PAIR }}  
+          key: ${{ secrets.EC2_KEY_PAIR }}
           script: |
-            # Application deployment.
+            echo "Starting deployment on EC2..."
+
+            # Move to project directory
             cd /home/ec2-user/app
 
-            sudo yum install python3 -y
-            curl -O https://bootstrap.pypa.io/get-pip.py
-            sudo python3 get-pip.py
-            python3 -m pip --version
+            # Ensure Python & Pip are available
+            if ! command -v python3 &>/dev/null; then
+              echo "Installing Python3..."
+              sudo yum install python3 -y
+            fi
+            python3 -m ensurepip --default-pip
 
-            # Virtual environment
-            python -m venv venv
+            # Set up virtual environment
+            python3 -m venv venv
             source venv/bin/activate
 
-            # Install the dependencies
+            # Install dependencies
             venv/bin/pip install --upgrade pip
             venv/bin/pip install -r requirements.txt
-            sudo pip install cryptography==3.3.2 urllib3==1.26.5 awscli
 
-            # Install nginx
-            sudo yum update -y
-            sudo yum install nginx -y
-            sudo mkdir -p /etc/nginx
-
-            # Copy nginx config and restart nginx
+            # Install & Configure Nginx if not installed
+            if ! command -v nginx &>/dev/null; then
+              echo "Installing Nginx..."
+              sudo yum install nginx -y
+            fi
             sudo cp ./nginx/nginx.conf /etc/nginx/nginx.conf
-            sudo systemctl start nginx
-            sudo systemctl enable nginx
+            sudo systemctl reload nginx 
 
-            # Start application server
-            pkill -f "uvicorn main:app"  || echo "No running Uvicorn process found"
-            echo "Starting application.."
+            # Restart application
+            pkill -f "uvicorn main:app" || echo "No running Uvicorn process found"
+            echo "Starting FastAPI application..."
             nohup venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
 
-            echo Application logs
+            # Show logs
+            echo "Last 20 application logs:"
             tail -n 20 app.log
