@@ -32,10 +32,7 @@ jobs:
           source: "./*"
           target: "/home/ec2-user/app"
           overwrite: true
-          script: |
-            sudo tar -zxf reNXjpUTTd.tar.gz --overwrite -C /home/ec2-user/app
-          
-
+    
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
