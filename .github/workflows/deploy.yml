@@ -39,7 +39,11 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_KEY_PAIR }}
           script: |
+            set -e
             echo "Starting deployment on EC2..."
+            
+            ssh -i <(echo "${{ secrets.EC2_KEY_PAIR }}") ec2-user@${{ secrets.EC2_HOST }} "echo Connected successfully" || exit 1
+
 
             # Move to project directory
             cd /home/ec2-user/app
