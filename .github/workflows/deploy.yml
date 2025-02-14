@@ -1,6 +1,6 @@
 name: Deployment Workflow
 
-on: 
+on:
   pull_request:
     types: [closed]
     branches: [main]
@@ -9,41 +9,57 @@ jobs:
   deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v3
 
-      - name: Setup application
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12.3'
 
-      - name: Install all dependencies from requirements
+      - name: Install dependencies
         run: |
-          # Setup virtual environment
           python -m venv venv
           source venv/bin/activate
-
-          # Install dependencies
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Copy nginx configuration and test
-        run: |
-          echo "Copying nginx configuration.."
-          sudo cp ./nginx/nginx.conf /etc/nginx/nginx.conf
-          sudo nginx -t
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@v0.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY_PAIR }} 
+          source: ./
+          target: /home/ec2-user/app
 
-      - name: Restart Nginx
-        run: |
-          echo "Restarting Nginx.."
-          sudo systemctl restart nginx
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KEY_PAIR }}  
+          script: |
+            # Application deployment..
+            cd /home/ec2-user/app
 
-      - name: Start application
-        run: |
-          echo "Application starting.."
-          source venv/bin/activate
-          nohup uvicorn main:app --host 0.0.0.0 --port 8000 > uvicorn.log 2>&1 &
+            # Virtual environment
+            python -m venv venv
+            source venv/bin/activate
 
-          echo "Application deployed.."
+            # Install dependencies
+            pip install --upgrade pip
+            pip install -r requirements.txt
+
+            # Copy nginx config and restart nginx
+            sudo cp ./nginx/nginx.conf /etc/nginx/nginx.conf
+            sudo systemctl restart nginx
+
+            # Start application server
+            pkill -f "uvicorn main:app"  || echo "No running Uvicorn process found"
+            echo "Starting application.."
+            nohup venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
+
+            echo Application logs
+            tail -n 20 app.log
