@@ -45,6 +45,8 @@ jobs:
             cd /home/ec2-user/app
 
             sudo yum install python3 -y
+            curl -O https://bootstrap.pypa.io/get-pip.py
+            sudo python3 get-pip.py
             python3 -m pip --version
 
             # Virtual environment
