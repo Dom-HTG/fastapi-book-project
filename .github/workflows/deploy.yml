@@ -83,6 +83,11 @@ jobs:
             sudo cp ./nginx/nginx.conf /etc/nginx/nginx.conf
             sudo systemctl reload nginx 
 
+            if ! command -v tmux &>/dev/null; then
+              echo "Installing tmux..."
+              sudo yum install tmux -y
+            fi
+
             # Start application
             echo "Starting FastAPI application..."
              tmux new -d -s bookproject "venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --reload > app.log 2>&1"
