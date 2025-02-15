@@ -81,7 +81,8 @@ jobs:
               sudo yum install nginx -y
             fi
             sudo cp ./nginx/nginx.conf /etc/nginx/nginx.conf
-            sudo systemctl reload nginx 
+            sudo systemctl restart nginx
+            echo "nginx restarted..."
 
             if ! command -v tmux &>/dev/null; then
               echo "Installing tmux..."
