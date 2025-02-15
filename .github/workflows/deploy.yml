@@ -40,7 +40,6 @@ jobs:
           key: ${{ secrets.EC2_KEY_PAIR }}
           script: |
             set -e
-            set -x # see each command via debug mode
             echo "Starting deployment on EC2..."
 
             # Retrieve pem
