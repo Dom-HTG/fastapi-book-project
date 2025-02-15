@@ -84,7 +84,7 @@ jobs:
             sudo systemctl reload nginx 
 
             # Gracefully handle process management
-            if pgrep -f "uvicorn main:app" > /dev/null; then
+            if pgrep -f "uvicorn main:app" > /dev/null || true; then
               echo "Stopping existing uvicorn process..."
               pkill -f "uvicorn main:app" || true
               sleep 2
