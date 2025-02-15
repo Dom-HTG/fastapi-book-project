@@ -83,15 +83,6 @@ jobs:
             sudo cp ./nginx/nginx.conf /etc/nginx/nginx.conf
             sudo systemctl reload nginx 
 
-            # Gracefully handle process management
-            if pgrep -f "uvicorn main:app" > /dev/null || true; then
-              echo "Stopping existing uvicorn process..."
-              pkill -f "uvicorn main:app" || true
-              sleep 2
-            else
-              echo "No existing uvicorn process found. Continuing..."
-            fi
-
             # Start application
             echo "Starting FastAPI application..."
              tmux new -d -s bookproject "venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --reload > app.log 2>&1"
